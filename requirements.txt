@@ -1,0 +1,8 @@
+## Python requirements
+boto3
+streamlit
+audio-recorder-streamlit
+sounddevice
+soundfile
+ratelimit
+langchain-community
