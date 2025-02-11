@@ -25,11 +25,11 @@ AWS Retrieval-Augmented Generation (RAG) enhances large language model (LLM) res
 
 ## Knowledge Base data
 
-script: generate_kb_data.py
+script: `generate_kb_data.py`
 
 The ECommerce company has a list of 30 products. Each product has Product Id, Product Name, Type, Color, Weight, Size, Company, Price
 
-The file products_inventory.json contains the inventory of some products. This inventory will be used for the Bedrock Agent Action Groups (/GetProductsInventory) inside the related lambda function.
+The file `products_inventory.json` contains the inventory of some products. This inventory will be used for the Bedrock Agent Action Groups (`/GetProductsInventory`) inside the related lambda function.
 
 ## Bedrock Agent orhcestration
 
