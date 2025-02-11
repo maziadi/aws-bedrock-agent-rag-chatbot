@@ -1,0 +1,119 @@
+Product Id: 1
+Product Name: Laptop
+Description: The Laptop is a purple accessories manufactured by Innovatech. It weighs 0.71 kg and costs $637.46.
+
+Product Id: 2
+Product Name: Keyboard
+Description: The Keyboard is a silver peripheral manufactured by TechCorp. It weighs 4.85 kg and costs $1040.42.
+
+Product Id: 3
+Product Name: Smartphone
+Description: The Smartphone is a blue accessories manufactured by Innovatech. It weighs 4.46 kg and costs $1560.65.
+
+Product Id: 4
+Product Name: Mouse
+Description: The Mouse is a blue gadget manufactured by GizmoWorks. It weighs 2.73 kg and costs $431.01.
+
+Product Id: 5
+Product Name: Headphones
+Description: The Headphones is a yellow peripheral manufactured by TechCorp. It weighs 3.24 kg and costs $445.21.
+
+Product Id: 6
+Product Name: Headphones
+Description: The Headphones is a black electronics manufactured by Innovatech. It weighs 1.88 kg and costs $918.11.
+
+Product Id: 7
+Product Name: Camera
+Description: The Camera is a silver peripheral manufactured by GizmoWorks. It weighs 0.62 kg and costs $71.01.
+
+Product Id: 8
+Product Name: Smartwatch
+Description: The Smartwatch is a silver peripheral manufactured by FutureGadgets. It weighs 2.3 kg and costs $365.63.
+
+Product Id: 9
+Product Name: Smartphone
+Description: The Smartphone is a red gadget manufactured by TechCorp. It weighs 2.18 kg and costs $1259.68.
+
+Product Id: 10
+Product Name: Monitor
+Description: The Monitor is a blue peripheral manufactured by ElectroWorld. It weighs 4.76 kg and costs $678.29.
+
+Product Id: 11
+Product Name: Headphones
+Description: The Headphones is a red electronics manufactured by ElectroWorld. It weighs 3.87 kg and costs $91.08.
+
+Product Id: 12
+Product Name: Camera
+Description: The Camera is a purple gadget manufactured by GizmoWorks. It weighs 0.55 kg and costs $141.94.
+
+Product Id: 13
+Product Name: Keyboard
+Description: The Keyboard is a green gadget manufactured by ElectroWorld. It weighs 1.14 kg and costs $1214.66.
+
+Product Id: 14
+Product Name: Keyboard
+Description: The Keyboard is a red electronics manufactured by TechCorp. It weighs 4.5 kg and costs $1986.38.
+
+Product Id: 15
+Product Name: Tablet
+Description: The Tablet is a red accessories manufactured by TechCorp. It weighs 3.91 kg and costs $1424.65.
+
+Product Id: 16
+Product Name: Mouse
+Description: The Mouse is a white gadget manufactured by TechCorp. It weighs 4.48 kg and costs $101.15.
+
+Product Id: 17
+Product Name: Smartwatch
+Description: The Smartwatch is a green peripheral manufactured by Innovatech. It weighs 1.17 kg and costs $1604.75.
+
+Product Id: 18
+Product Name: Keyboard
+Description: The Keyboard is a green electronics manufactured by TechCorp. It weighs 2.75 kg and costs $1883.91.
+
+Product Id: 19
+Product Name: Smartphone
+Description: The Smartphone is a white peripheral manufactured by FutureGadgets. It weighs 1.06 kg and costs $1753.38.
+
+Product Id: 20
+Product Name: Tablet
+Description: The Tablet is a green electronics manufactured by GizmoWorks. It weighs 1.26 kg and costs $175.14.
+
+Product Id: 21
+Product Name: Smartphone
+Description: The Smartphone is a white accessories manufactured by ElectroWorld. It weighs 2.23 kg and costs $1087.54.
+
+Product Id: 22
+Product Name: Camera
+Description: The Camera is a silver accessories manufactured by GizmoWorks. It weighs 4.94 kg and costs $565.4.
+
+Product Id: 23
+Product Name: Smartphone
+Description: The Smartphone is a yellow electronics manufactured by FutureGadgets. It weighs 1.68 kg and costs $1583.0.
+
+Product Id: 24
+Product Name: Tablet
+Description: The Tablet is a silver peripheral manufactured by Innovatech. It weighs 2.51 kg and costs $736.29.
+
+Product Id: 25
+Product Name: Smartphone
+Description: The Smartphone is a blue electronics manufactured by Innovatech. It weighs 4.82 kg and costs $1767.96.
+
+Product Id: 26
+Product Name: Tablet
+Description: The Tablet is a purple gadget manufactured by ElectroWorld. It weighs 3.18 kg and costs $193.94.
+
+Product Id: 27
+Product Name: Monitor
+Description: The Monitor is a blue peripheral manufactured by GizmoWorks. It weighs 0.94 kg and costs $1989.49.
+
+Product Id: 28
+Product Name: Laptop
+Description: The Laptop is a pink gadget manufactured by TechCorp. It weighs 0.72 kg and costs $1924.99.
+
+Product Id: 29
+Product Name: Smartphone
+Description: The Smartphone is a purple peripheral manufactured by ElectroWorld. It weighs 4.2 kg and costs $59.31.
+
+Product Id: 30
+Product Name: Keyboard
+Description: The Keyboard is a purple electronics manufactured by TechCorp. It weighs 4.62 kg and costs $631.51.
