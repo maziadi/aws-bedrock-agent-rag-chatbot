@@ -7,7 +7,8 @@ To provide an interactive interface, the PoC utilizes **Streamlit**, enabling a 
 Before running the application, ensure that all necessary dependencies are installed, including:  
 - **AWS credentials and IAM roles** with appropriate permissions  
 - Required **Python modules** and dependencies (as specified in `requirements.txt`)  
-- Proper configuration of the **Knowledge Base** within AWS Bedrock  
+- Proper configuration of the **Knowledge Base** within AWS Bedrock
+- Proper configuration of **Bedrock Agent** with alias, previous knoweldge base and group actions (see related lambda function and openapi schema) 
 
 Once the setup is complete, launch the Streamlit application with the following command:  
 
