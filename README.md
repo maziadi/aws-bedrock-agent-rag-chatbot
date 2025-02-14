@@ -38,7 +38,9 @@ The file `products_inventory.json` contains the inventory of some products. This
 
 Agents orchestrate and analyze the task and break it down into the correct logical sequence using the FM’s reasoning abilities. Agents automatically call the necessary APIs to transact with the company systems and processes to fulfill the request, determining along the way if they can proceed or if they need to gather more information.
 
-## Demo: Agent with RAG and Voice chatting
+# Bedrock AI Chatbot with Knowledge Base, Agent, and Voice Interaction
+
+This repository contains a Python-based chatbot application that leverages AWS Bedrock services, AWS Transcribe, AWS Polly, and several other tools to provide a rich, interactive conversational experience. Users can interact with the chatbot via text or voice. The chatbot can retrieve contextual information from a knowledge base, reason using a Bedrock agent, and even convert responses to speech for an immersive experience.
 
 ```bash
 python -m streamlit run scripts/aws_poc_interact_with_Agent_UI_enhancement_voice_chatting.pyy
@@ -47,10 +49,6 @@ python -m streamlit run scripts/aws_poc_interact_with_Agent_UI_enhancement_voice
 ![Recording](images/recording.png)
 
 ![Agent with RAG and Voice chatting](images/chatbot_agent_RAG_Voice_chatting.png)
-
-# Bedrock AI Chatbot with Knowledge Base, Agent, and Voice Interaction
-
-This repository contains a Python-based chatbot application that leverages AWS Bedrock services, AWS Transcribe, AWS Polly, and several other tools to provide a rich, interactive conversational experience. Users can interact with the chatbot via text or voice. The chatbot can retrieve contextual information from a knowledge base, reason using a Bedrock agent, and even convert responses to speech for an immersive experience.
 
 ---
 
