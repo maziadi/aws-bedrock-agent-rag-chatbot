@@ -377,7 +377,7 @@ st.title("Bedrock AI Chatbot with Knowledge Base, Agent, and Voice Interaction")
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE.md).
 
 ---
 
