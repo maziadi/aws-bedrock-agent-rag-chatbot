@@ -66,6 +66,29 @@ Product Id ,Product Name ,Type        ,Color  ,Weight ,Size   ,Company       ,Pr
 
 The file `products_inventory.json` contains the inventory of some products. This inventory will be used for the Bedrock Agent Action Groups (`/GetProductsInventory`) inside the related lambda function.
 
+```
+                  {"Product Id": "1", "Product Name": "Laptop", "Quantity": 297},
+			{"Product Id": "2", "Product Name": "Keyboard", "Quantity": 0},
+			{"Product Id": "3", "Product Name": "Smartphone", "Quantity": 463},
+			{"Product Id": "4", "Product Name": "Mouse", "Quantity": 904},
+			{"Product Id": "5", "Product Name": "Headphones", "Quantity": 440},
+			{"Product Id": "6", "Product Name": "Headphones", "Quantity": 608},
+			{"Product Id": "7", "Product Name": "Camera", "Quantity": 0},
+			{"Product Id": "8", "Product Name": "Smartwatch", "Quantity": 791},
+			{"Product Id": "9", "Product Name": "Smartphone", "Quantity": 384},
+			{"Product Id": "10", "Product Name": "Monitor", "Quantity": 707},
+			{"Product Id": "11", "Product Name": "Headphones", "Quantity": 971},
+			{"Product Id": "12", "Product Name": "Camera", "Quantity": 172},
+			{"Product Id": "13", "Product Name": "Keyboard", "Quantity": 936},
+			{"Product Id": "14", "Product Name": "Keyboard", "Quantity": 732},
+			{"Product Id": "15", "Product Name": "Tablet", "Quantity": 0},
+			{"Product Id": "16", "Product Name": "Mouse", "Quantity": 642},
+			{"Product Id": "17", "Product Name": "Smartwatch", "Quantity": 31},
+			{"Product Id": "18", "Product Name": "Keyboard    ", "Quantity": 674},
+			{"Product Id": "19", "Product Name": "Smartphone", "Quantity": 203},
+			{"Product Id": "20", "Product Name": "Tablet", "Quantity": 698}
+```
+
 ## Bedrock Agent orchestration
 
 ![Bedrock Agent orchestration](images/agent_orchestration.gif)
@@ -80,9 +103,23 @@ This repository contains a Python-based chatbot application that leverages AWS B
 python -m streamlit run scripts/aws_poc_interact_with_Agent_UI_enhancement_voice_chatting.pyy
 ```  
 
+## Demo: Screenshots
+
+### Agent RAG - Knowledge-Base
+
+![Agent Thinking](images/agent_thinking.png)
+
+![Agent RAG](images/Agent_RAG_answer.png)
+
+### Voice chatting - Agent Action Groups: Action 1: /GetProductsInventory
+
 ![Recording](images/recording.png)
 
-![Agent with RAG and Voice chatting](images/chatbot_agent_RAG_Voice_chatting.png)
+![Agent action_groups and Voice chatting](images/chatbot_agent_RAG_Voice_chatting.png)
+
+### Agent Action Groups: Action 2: /RestockProduct
+
+![Agent action_groups_restock_product](images/agent_restock_product.png)
 
 ---
 
