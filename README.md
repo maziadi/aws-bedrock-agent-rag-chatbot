@@ -102,25 +102,6 @@ This repository contains a Python-based chatbot application that leverages AWS B
 ```bash
 python -m streamlit run scripts/aws_poc_interact_with_Agent_UI_enhancement_voice_chatting.pyy
 ```  
-
-## Demo: Screenshots
-
-### Agent RAG - Knowledge-Base
-
-![Agent Thinking](images/agent_thinking.png)
-
-![Agent RAG](images/Agent_RAG_answer.png)
-
-### Voice chatting - Agent Action Groups: Action 1: /GetProductsInventory
-
-![Recording](images/recording.png)
-
-![Agent action_groups and Voice chatting](images/chatbot_agent_RAG_Voice_chatting.png)
-
-### Agent Action Groups: Action 2: /RestockProduct
-
-![Agent action_groups_restock_product](images/agent_restock_product.png)
-
 ---
 
 ## Table of Contents
@@ -137,6 +118,7 @@ python -m streamlit run scripts/aws_poc_interact_with_Agent_UI_enhancement_voice
   - [Audio Processing](#audio-processing)
   - [Streamlit User Interface](#streamlit-user-interface)
 - [Running the Application](#running-the-application)
+- [Demo: Screenshots](#demo-screenshots)
 - [License](#license)
 
 ---
@@ -443,6 +425,26 @@ st.title("Bedrock AI Chatbot with Knowledge Base, Agent, and Voice Interaction")
    
 4. **Interact with the Chatbot:**  
    Open the provided URL in your browser, and start interacting with the chatbot either via text or by recording your voice.
+
+---
+
+## Demo: Screenshots
+
+### Agent RAG - Knowledge-Base
+
+![Agent Thinking](images/agent_thinking.png)
+
+![Agent RAG](images/Agent_RAG_answer.png)
+
+### Voice chatting - Agent Action Groups: Action 1: /GetProductsInventory
+
+![Recording](images/recording.png)
+
+![Agent action_groups and Voice chatting](images/chatbot_agent_RAG_Voice_chatting.png)
+
+### Agent Action Groups: Action 2: /RestockProduct
+
+![Agent action_groups_restock_product](images/agent_restock_product.png)
 
 ---
 
