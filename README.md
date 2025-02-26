@@ -424,7 +424,7 @@ st.title("Bedrock AI Chatbot with Knowledge Base, Agent, and Voice Interaction")
    ```
    
 4. **Interact with the Chatbot:**  
-   Open the provided URL in your browser, and start interacting with the chatbot either via text or by recording your voice.
+   Open the provided URL (http://localhost:8501) in your browser, and start interacting with the chatbot either via text or by recording your voice.
 
 ---
 
