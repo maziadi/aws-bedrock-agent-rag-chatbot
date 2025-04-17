@@ -13,7 +13,7 @@ Before running the application, ensure that all necessary dependencies are insta
 Once the setup is complete, launch the Streamlit application with the following command:  
 
 ```bash
-python -m streamlit run script.py
+python -m streamlit run aws_poc_interact_with_Agent_UI_enhancement_voice_chatting.py
 ```  
 
 This will initialize the chatbot interface (http://localhost:8501), allowing users to test and interact with the Bedrock-powered system efficiently.
@@ -100,7 +100,7 @@ Agents orchestrate and analyze the task and break it down into the correct logic
 This repository contains a Python-based chatbot application that leverages AWS Bedrock services, AWS Transcribe, AWS Polly, and several other tools to provide a rich, interactive conversational experience. Users can interact with the chatbot via text or voice. The chatbot can retrieve contextual information from a knowledge base, reason using a Bedrock agent, and even convert responses to speech for an immersive experience.
 
 ```bash
-python -m streamlit run scripts/aws_poc_interact_with_Agent_UI_enhancement_voice_chatting.pyy
+python -m streamlit run scripts/aws_poc_interact_with_Agent_UI_enhancement_voice_chatting.py
 ```  
 ---
 
