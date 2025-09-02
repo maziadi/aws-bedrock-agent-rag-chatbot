@@ -212,10 +212,10 @@ terraform init
 Update `variables` in `main.tf` or create a `terraform.tfvars` file:
 
 ```hcl
-region         = "us-east-1"
-environment    = "prod"
-root_domain    = "mydomain.com"
-hosted_zone_id = "Z1234567890"
+region          = "us-east-1"
+environment     = "prod"
+root_domain     = "mydomain.com"
+hosted_zone_id  = "Z1234567890"
 container_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/my-chatbot:latest"
 ```
 ### 3. Apply the configuration
@@ -340,20 +340,20 @@ EXPOSE 8501
 CMD ["streamlit", "run", "application.py", "--server.port=8501", "--server.address=0.0.0.0"]
 ```
 .env :
-```bash
-AWS_REGION=us-east-1
-S3_BUCKET_NAME=bedrock-agent-chatbot-voice-text-conversations
-MODEL_ID=anthropic.claude-v2
-KNOWLEDGE_BASE_ID=YOUR_KNOWLEDGE_BASE_ID
-AGENT_ID=YOUR_AGENT_ID
-AGENT_ALIAS=YOUR_AGENT_ALIAS
-AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
-AWS_SESSION_TOKEN=YOUR_AWS_SESSION_TOKEN
+```hcl
+AWS_REGION="us-east-1"
+S3_BUCKET_NAME="bedrock-agent-chatbot-voice-text-conversations" #change the name with the name of your bucket
+MODEL_ID="anthropic.claude-v2"
+KNOWLEDGE_BASE_ID="YOUR_KNOWLEDGE_BASE_ID"
+AGENT_ID="YOUR_AGENT_ID"
+AGENT_ALIAS="YOUR_AGENT_ALIAS"
+AWS_ACCESS_KEY_ID="YOUR_AWS_ACCESS_KEY_ID"
+AWS_SECRET_ACCESS_KEY="YOUR_AWS_SECRET_ACCESS_KEY"
+AWS_SESSION_TOKEN="YOUR_AWS_SESSION_TOKEN"
 ```
 ## Pushing Docker image to AWS ECR
 
-```
+```bash
 1. Create your ECR Repository
 2. aws ecr get-login-password --region YOUR_REGION | docker login --username AWS --password-stdin \
 YOUR_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
