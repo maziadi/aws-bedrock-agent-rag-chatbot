@@ -1,22 +1,165 @@
-# aws-bedrock-agent-rag-chatbot
+# Bedrock RAG Chatbot Infrastructure
 
-This AWS Proof of Concept (PoC) demonstrates the implementation of a Bedrock-powered chatbot agent integrated with a Knowledge Base using Retrieval-Augmented Generation (RAG). The solution leverages **Amazon Bedrock** for natural language understanding and contextual responses while enhancing accuracy through the RAG approach.  
+This AWS Accelerator/Proof of Concept (PoC) demonstrates the implementation of a **Bedrock-powered chatbot agent** integrated with a **Knowledge Base** using **Retrieval-Augmented Generation (RAG)**. The solution leverages **Amazon Bedrock** for natural language understanding and contextual responses while enhancing accuracy through the RAG approach.  
 
-To provide an interactive interface, the PoC utilizes **Streamlit**, enabling a lightweight, locally hosted web UI for seamless interaction with the Bedrock Agent and its Knowledge Base. This UI allows users to input queries, retrieve relevant information, and receive AI-driven responses in real time.  
+To provide an interactive interface, the PoC utilizes **Streamlit**, enabling a lightweight application web UI hosted in **Amazon ECS (Elastic Container Registry)**, UI for seamless interaction with the Bedrock Agent and its Knowledge Base. After authentication, this UI allows users to input queries, retrieve relevant information, and receive AI-driven responses in real time.  
 
-Before running the application, ensure that all necessary dependencies are installed, including:  
-- **AWS credentials and IAM roles** with appropriate permissions  
-- Required **Python modules** and dependencies (as specified in `requirements.txt`)  
-- Proper configuration of the **Knowledge Base** within AWS Bedrock: [AWS documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-create.html)
-- Proper configuration of **Bedrock Agent** with alias, previous knoweldge base and group actions (see related lambda function and openapi schema) [AWS documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-create.html) 
+The infrastructure is managed by **Terraform (IaC)** and contains code to deploy and end-to-end environment to host the RAG chatbot.
 
-Once the setup is complete, launch the Streamlit application with the following command:  
+---
+
+# 🚀 Architecture Overview
+
+![Architecure_overview](images/AWS_Bedrock_chatbot_infrastructure.png)
+
+* This repository contains Terraform code to deploy the RAG-Chatbot using AWS Bedrock, Amazon ECS (EC2 launch type, could be adjusted to Fargate), Application Load Balancer with Cognito authentication, and Aurora PostgreSQL Serverless v2 for vector storage.
+
+* The chatbot is accessible through a secure HTTPS endpoint protected by Cognito, integrates with Bedrock Agents, and supports retrieval from a Knowledge Base (RDS + S3).
+The infrastructure provisions the following:
+
+* **Networking & Security**
+
+  * Uses the default VPC with public and private subnets
+  * Security groups for ALB, ECS instances, and Aurora DB
+  * HTTPS-only ingress with ACM-managed TLS certificates
+
+* **Authentication**
+
+  * Amazon Cognito User Pool + App Client
+  * Custom Cognito domain `authentication.chatbot.<root_domain>`
+  * Route53 records for authentication and main chatbot domain
+
+* **Application Hosting**
+
+  * ECS Cluster with EC2 instances (Amazon Linux 2 ECS-optimized AMI)
+  * Autoscaling Group with configurable `min`, `max`, and `desired` instance counts
+  * ECS Task Definition running the chatbot container (Streamlit app on port 8501)
+  * Application Load Balancer (ALB) with Cognito authentication and target group
+
+* **Storage & Data**
+
+  * S3 bucket for **voice MP3 uploads** (used by AWS Transcribe)
+  * S3 bucket for **knowledge base documents** 
+  * Aurora PostgreSQL Serverless v2 cluster for embeddings storage
+  * Secrets Manager for Aurora DB credentials
+  * Usage of **Amazon Polly** (TTS) when the user submits a voice request
+
+* **AI & Bedrock**
+
+  * Bedrock Knowledge Base with vector embeddings (Titan embedding model)
+  * Bedrock Agent with RAG capabilities
+  * Agent associated with Knowledge Base
+  * Bedrock Action Group backed by AWS Lambda (with OpenAPI schema for product inventory example APIs)
+
+* **Observability**
+
+  * CloudWatch Logs integration for ECS tasks and Lambda
+
+* **Access and Permissions**
+
+  * Multiple IAM roles & permissions for a fine-grained access and communications between the used services
+
+---
+
+### 📦 Prerequisites
+
+Before deploying, ensure you have:
+
+1. **Terraform ≥ 1.6.0**
+2. **AWS CLI configured** with credentials and access
+3. A **Route53 Hosted Zone** for your domain
+4. Existing **ACM certificates** for:
+
+   * wildcard `*.your-domain.com` or `chatbot.your-domain.com`
+   * `authentication.chatbot.your-domain.com`
+5. An **ECR container image** for the chatbot application (see the application section for Dockerization & push to AWS ECR)
+
+---
+
+### ⚙️ Key Variables
+
+| Variable                               | Default                                          | Description                                            |
+| -------------------------------------- | ------------------------------------------------ | ------------------------------------------------------ |
+| `region`                               | `us-east-1`                                      | AWS region                                             |
+| `environment`                          | `prod`                                           | Environment name                                       |
+| `root_domain`                          | `crayon-poc.org`                                 | Root domain for Route53                                |
+| `hosted_zone_id`                       | `Z02917741R99X3VO1YC83`                          | Route53 hosted zone ID                                 |
+| `chatbot_subdomain`                    | `chatbot`                                        | Subdomain for chatbot                                  |
+| `existing_acm_cert_arn`                | (ARN)                                            | ACM cert for chatbot domain                            |
+| `existing_authentication_acm_cert_arn` | (ARN)                                            | ACM cert for Cognito auth domain                       |
+| `container_image`                      | ECR URI                                          | Chatbot container image                                |
+| `bedrock_model_id`                     | `anthropic.claude-v2`                            | Bedrock model for inference                            |
+| `bedrock_foundation_model`             | `anthropic.claude-3-haiku...`                    | Bedrock foundation model                               |
+| `voice_bucket_name`                    | `bedrock-agent-chatbot-voice-text-conversations` | S3 bucket for voice inputs                             |
+| `desired_count`                        | `1`                                              | ECS desired task count                                 |
+| `instance_type`                        | `t3.small`                                       | EC2 instance type for ECS                              |
+| `db_username`                          | `postgres`                                       | Aurora DB username                                     |
+| `db_password`                          | `Managed by Secret Manager`                      | Aurora DB password (use Secrets Manager in production) |
+
+---
+
+### 🛠️ Deployment
+
+#### 1. Initialize Terraform
 
 ```bash
-python -m streamlit run aws_poc_interact_with_Agent_UI_enhancement_voice_chatting.py
-```  
+terraform init
+```
 
-This will initialize the chatbot interface (http://localhost:8501), allowing users to test and interact with the Bedrock-powered system efficiently.
+#### 2. Review and customize variables
+
+Update `variables` in `main.tf` or create a `terraform.tfvars` file:
+
+```hcl
+region         = "us-east-1"
+environment    = "prod"
+root_domain    = "mydomain.com"
+hosted_zone_id = "Z1234567890"
+container_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/my-chatbot:latest"
+```
+
+#### 3. Apply the configuration
+
+```bash
+terraform apply
+```
+
+### 🌐 DNS & Endpoints
+
+* **Chatbot Web App:**
+  `https://chatbot.<root_domain>` → routed via ALB → ECS Streamlit app
+
+* **Authentication Domain (Cognito):**
+  `https://authentication.chatbot.<root_domain>`
+
+---
+
+### 🔐 Authentication Flow
+
+1. User accesses `chatbot.<root_domain>`
+2. ALB redirects to Cognito authentication
+3. Cognito validates login → issues tokens
+4. Authenticated traffic forwarded to ECS task
+
+---
+
+### 📚 Knowledge Base Setup
+
+* Upload documents (to be used for the RAG) to S3 bucket: `crayon-knowledge-base-data` # it is important to change the name of this bucket for your case
+* Aurora PostgreSQL cluster stores embeddings
+* Vector indexes (`hnsw`) and text search indexes are automatically created
+* Bedrock Knowledge Base links S3 + Aurora
+* Bedrock Agent is associated with the KB
+
+---
+
+### ⚡ Bedrock Agent Action Groups
+
+* Includes a Lambda-based action group
+* Lambda executes API requests defined by an **OpenAPI schema**
+* Example: Inventory management API (`/GetProductsInventory`, `/RestockProduct`)
+
+---
 
 ## AWS RAG/KnowledgeBase
 
@@ -68,7 +211,7 @@ Product Id ,Product Name ,Type        ,Color  ,Weight ,Size   ,Company       ,Pr
 The file `products_inventory.json` contains the inventory of some products. This inventory will be used for the Bedrock Agent Action Groups (`/GetProductsInventory`) inside the related lambda function.
 
 ```
-                        {"Product Id": "1", "Product Name": "Laptop", "Quantity": 297},
+            {"Product Id": "1", "Product Name": "Laptop", "Quantity": 297},
 			{"Product Id": "2", "Product Name": "Keyboard", "Quantity": 0},
 			{"Product Id": "3", "Product Name": "Smartphone", "Quantity": 463},
 			{"Product Id": "4", "Product Name": "Mouse", "Quantity": 904},
@@ -96,7 +239,7 @@ The file `products_inventory.json` contains the inventory of some products. This
 
 Agents orchestrate and analyze the task and break it down into the correct logical sequence using the FM’s reasoning abilities. Agents automatically call the necessary APIs to transact with the company systems and processes to fulfill the request, determining along the way if they can proceed or if they need to gather more information.
 
-# Bedrock AI Chatbot with Knowledge Base, Agent, and Voice Interaction
+# Application
 
 This repository contains a Python-based chatbot application that leverages AWS Bedrock services, AWS Transcribe, AWS Polly, and several other tools to provide a rich, interactive conversational experience. Users can interact with the chatbot via text or voice. The chatbot can retrieve contextual information from a knowledge base, reason using a Bedrock agent, and even convert responses to speech for an immersive experience.
 
