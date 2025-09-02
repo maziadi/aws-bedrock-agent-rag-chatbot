@@ -160,7 +160,7 @@ The file `products_inventory.json` contains the inventory of some products. This
 
 Agents orchestrate and analyze the task and break it down into the correct logical sequence using the FM’s reasoning abilities. Agents automatically call the necessary APIs to transact with the company systems and processes to fulfill the request, determining along the way if they can proceed or if they need to gather more information.
 
-# Terraform Deploymnt
+# Terraform Deployment
 
 ## 📦 Prerequisites
 
