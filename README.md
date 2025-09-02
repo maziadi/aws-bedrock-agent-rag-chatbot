@@ -258,6 +258,7 @@ This repository contains a Python-based chatbot application that leverages AWS B
 
 ## The application components
 
+The script: `application.py`
 ### Features
 
 - **Multi-modal Interaction:** Users can communicate via text or voice.
