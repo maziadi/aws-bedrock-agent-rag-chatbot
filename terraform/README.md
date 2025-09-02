@@ -1,6 +1,6 @@
-# Terraform Deploymnt
+# Terraform Deployment
 
-![Architecure_overview](images/AWS_Bedrock_chatbot_infrastructure.png)
+![Architecure_overview](../images/AWS_Bedrock_chatbot_infrastructure.png)
 
 ## 📦 Prerequisites
 
