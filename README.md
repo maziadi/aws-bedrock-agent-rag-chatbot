@@ -4,7 +4,7 @@ This AWS Accelerator/Proof of Concept (PoC) demonstrates the implementation of a
 
 To provide an interactive interface, the PoC utilizes **Streamlit**, enabling a lightweight application web UI hosted in **Amazon ECS (Elastic Container Service)**, UI for seamless interaction with the Bedrock Agent and its Knowledge Base. After authentication, this UI allows users to input queries, retrieve relevant information, and receive AI-driven responses in real time.  
 
-The infrastructure is managed by **Terraform (IaC)** and contains code to deploy and end-to-end environment to host the RAG chatbot.
+The infrastructure is managed by **Terraform (IaC)** and the repository contains code to deploy an end-to-end environment to host the RAG chatbot.
 
 # Table of Contents
 
