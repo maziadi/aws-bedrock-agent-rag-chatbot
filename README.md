@@ -78,6 +78,7 @@ The infrastructure provisions the following:
 * **Observability**
 
   * CloudWatch Logs integration for ECS tasks and Lambda
+  * Custom CloudWatch dashboard (GenAI Infrastructure Overview) showing some infrastructure metrics related to Bedrock, ECS, ALB, Cognito & RDS Aurora DB.
 
 * **Access and Permissions**
 
