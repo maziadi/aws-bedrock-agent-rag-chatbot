@@ -8,7 +8,6 @@ The infrastructure is managed by **Terraform (IaC)** and contains code to deploy
 
 # Table of Contents
 
-- [AWS Bedrock RAG Chatbot Infrastructure](#aws-bedrock-rag-chatbot-infrastructure)
 - [Architecture Overview](#-architecture-overview)
 - [AWS RAG/Knowledge-Base/ Agent Orchestration](#aws-ragknowledge-base-agent-orchestration)
   - [Knowledge Base data](#knowledge-base-data)
