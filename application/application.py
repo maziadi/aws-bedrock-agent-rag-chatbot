@@ -10,26 +10,27 @@ from langchain.prompts import PromptTemplate
 import boto3
 import streamlit as st
 from audio_recorder_streamlit import audio_recorder
-import sounddevice as sd
-import soundfile as sf
+from io import BytesIO
+# ---------------------------------------------
+# Configuration (via .env or ECS Task env vars)
+# ---------------------------------------------
+S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "bedrock-agent-chatbot-voice-text-conversations")
+MODEL_ID = os.getenv("MODEL_ID", "anthropic.claude-v2")
+KNOWLEDGE_BASE_ID = os.getenv("KNOWLEDGE_BASE_ID", "")
+AGENT_ID = os.getenv("AGENT_ID", "")
+AGENT_ALIAS = os.getenv("AGENT_ALIAS", "")
+AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 
-# Ensure AWS credentials are correctly set up
-session = boto3.Session(profile_name="maziadi")
-bedrock_client = session.client("bedrock-runtime", region_name="us-east-1")
-kbs_client = session.client("bedrock-agent-runtime", region_name="us-east-1")
-agent_client = session.client("bedrock-agent-runtime", region_name="us-east-1")
-transcribe_client = session.client("transcribe", region_name="us-east-1")
-polly_client = session.client("polly", region_name="us-east-1")
-s3_client = session.client("s3", region_name="us-east-1")
-
-# S3 bucket configuration
-S3_BUCKET_NAME = "maziadi-bedrock-agent-chatbot-voice-text-conversations"
-
-# Bedrock Model & Knowledge Base Config
-MODEL_ID = "anthropic.claude-v2"
-KNOWLEDGE_BASE_ID = "RR9ZKRQOR1"
-AGENT_ID = "VURA79GVOW"
-AGENT_ALIAS = "KPEQSPGXPP"
+# ------------
+# AWS Clients
+# ------------
+session = boto3.Session(region_name=AWS_REGION)
+bedrock_client = session.client("bedrock-runtime")
+kbs_client = session.client("bedrock-agent-runtime")
+agent_client = session.client("bedrock-agent-runtime")
+transcribe_client = session.client("transcribe")
+polly_client = session.client("polly")
+s3_client = session.client("s3")
 
 # Rate limiting configuration
 CALLS_PER_MINUTE = 100
@@ -133,7 +134,7 @@ def transcribe_audio(audio_file_path):
         status = transcribe_client.get_transcription_job(TranscriptionJobName=job_name)
         if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:
             break
-        time.sleep(5)
+        time.sleep(1)
     
     if status['TranscriptionJob']['TranscriptionJobStatus'] == 'COMPLETED':
         result = transcribe_client.get_transcription_job(TranscriptionJobName=job_name)
@@ -164,78 +165,112 @@ def text_to_speech(text, language):
     else:
         return None
 
-# Streamlit UI
-st.title("Bedrock AI Chatbot with Knowledge Base, Agent, and Voice Interaction")
-
-# Initialize session state
-if 'conversation_history' not in st.session_state:
+# ----------------------
+# Initialisation Session
+# ----------------------
+if "conversation_history" not in st.session_state:
     st.session_state.conversation_history = []
 
-# Sidebar for User Input
+if "voice_input" not in st.session_state:
+    st.session_state.voice_input = None
+
+if "last_ai_response" not in st.session_state:
+    st.session_state.last_ai_response = None
+
+if "is_listening" not in st.session_state:
+    st.session_state.is_listening = False
+
+# -------------
+# STREAMLIT UI
+# -------------
+st.title("Bedrock AI Chatbot (Agent + RAG)")
+
+# Sidebar
 language = st.sidebar.selectbox("Select Language", ["english", "french"])
 use_agent = st.sidebar.checkbox("Use Bedrock Agent for Reasoning")
 
-# Chat interface
-st.write("Chat with the AI:")
-
-# Display conversation history
-for human, ai in st.session_state.conversation_history:
+# History
+for idx, (human, ai) in enumerate(st.session_state.conversation_history):
     with st.chat_message("human"):
         st.write(human)
+
     with st.chat_message("ai"):
         st.write(ai)
-        
-        # Add a button to play the AI response
-        audio_file = text_to_speech(ai, language)
-        if audio_file:
-            st.audio(audio_file, format="audio/mp3")
+        # Listen button disabled if currently listening
+        if st.button("🔊 Listen", key=f"listen_{idx}", disabled=st.session_state.is_listening):
+            st.session_state.is_listening = True
+            audio_bytes = text_to_speech(ai, language)
+            st.audio(audio_bytes, format="audio/mp3", autoplay=True)
+            st.session_state.is_listening = False
 
-# Voice input
-st.write("Record your voice:")
-audio_bytes = audio_recorder()
+# ----------------------
+# VOICE INPUT
+# ----------------------
+st.write("🎙️ Record your voice:")
+audio_bytes = audio_recorder(
+    text="",
+    recording_color="#e74c3c",
+    neutral_color="#10a37f",
+    icon_size="42px"
+)
+
 if audio_bytes:
-    # Save audio to a temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
         temp_audio.write(audio_bytes)
         temp_audio_path = temp_audio.name
-    
-    # Transcribe the audio
-    transcript = transcribe_audio(temp_audio_path)
-    
-    if transcript != "Transcription failed":
-        st.write(f"Transcription: {transcript}")
-        user_input = transcript
-    else:
-        st.error("Failed to transcribe audio. Please try again.")
-        user_input = None
-else:
-    # Text input as fallback
-    user_input = st.chat_input("Type your message here...")
 
+    transcript = transcribe_audio(temp_audio_path)
+    if transcript != "Transcription failed":
+        st.write(f"📝 Transcription: {transcript}")
+        # Send automatically
+        st.session_state.voice_input = transcript
+    else:
+        st.error("❌ Failed to transcribe audio. Please try again.")
+
+# ----------------------
+# TEXT INPUT
+# ----------------------
+text_input = st.chat_input("Type your message here...", disabled=st.session_state.is_listening)
+
+# Fusion des inputs
+user_input = None
+if text_input:
+    user_input = text_input
+elif st.session_state.voice_input:
+    user_input = st.session_state.voice_input
+    st.session_state.voice_input = None
+
+# ----------------------
+# Processing User Request
+# ----------------------
 if user_input:
-    # Add user message to conversation history
     st.session_state.conversation_history.append((user_input, ""))
-    
+
     with st.chat_message("human"):
         st.write(user_input)
 
     with st.chat_message("ai"):
-        with st.spinner('Thinking...'):
+        with st.spinner("Thinking..."):
             ai_response = my_chatbot(language, user_input, use_agent, st.session_state.conversation_history)
             st.write(ai_response)
-            
-            # Convert AI response to speech
-            audio_file = text_to_speech(ai_response, language)
-            if audio_file:
-                st.audio(audio_file, format="audio/mp3")
-    
-    # Update conversation history with AI response
-    st.session_state.conversation_history[-1] = (user_input, ai_response)
 
-# Add a rate limit information display
-st.sidebar.info(f"Note: Requests are limited to {CALLS_PER_MINUTE} per minute to avoid throttling.")
+        st.session_state.conversation_history[-1] = (user_input, ai_response)
+        st.session_state.last_ai_response = ai_response
 
-# Option to clear conversation history
-if st.sidebar.button("Clear Conversation"):
+# -------------------------------
+# Listen button for last response
+# -------------------------------
+if st.session_state.last_ai_response:
+    if  st.button("🔊 Listen", key="listen_last", disabled=st.session_state.is_listening):
+        st.session_state.is_listening = True
+        audio_bytes = text_to_speech(st.session_state.last_ai_response, language)
+        st.audio(audio_bytes, format="audio/mp3", autoplay=True)
+        st.session_state.is_listening = False
+
+# -------------------
+# Additional Options
+# -------------------
+if  st.sidebar.button("Clear Conversation"):
     st.session_state.conversation_history = []
+    st.session_state.last_ai_response = None
     st.rerun()
