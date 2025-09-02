@@ -1,12 +1,27 @@
-# Bedrock RAG Chatbot Infrastructure
+# AWS Bedrock RAG Chatbot Infrastructure
 
 This AWS Accelerator/Proof of Concept (PoC) demonstrates the implementation of a **Bedrock-powered chatbot agent** integrated with a **Knowledge Base** using **Retrieval-Augmented Generation (RAG)**. The solution leverages **Amazon Bedrock** for natural language understanding and contextual responses while enhancing accuracy through the RAG approach.  
 
-To provide an interactive interface, the PoC utilizes **Streamlit**, enabling a lightweight application web UI hosted in **Amazon ECS (Elastic Container Registry)**, UI for seamless interaction with the Bedrock Agent and its Knowledge Base. After authentication, this UI allows users to input queries, retrieve relevant information, and receive AI-driven responses in real time.  
+To provide an interactive interface, the PoC utilizes **Streamlit**, enabling a lightweight application web UI hosted in **Amazon ECS (Elastic Container Service)**, UI for seamless interaction with the Bedrock Agent and its Knowledge Base. After authentication, this UI allows users to input queries, retrieve relevant information, and receive AI-driven responses in real time.  
 
 The infrastructure is managed by **Terraform (IaC)** and contains code to deploy and end-to-end environment to host the RAG chatbot.
 
----
+# Table of Contents
+
+- [Features](#features)
+- [Architecture Overview](#architecture-overview)
+- [Prerequisites](#prerequisites)
+- [Setup and Configuration](#setup-and-configuration)
+- [Code Structure and Explanation](#code-structure-and-explanation)
+  - [AWS Clients and Configuration](#aws-clients-and-configuration)
+  - [Rate Limiting](#rate-limiting)
+  - [Knowledge Base and Agent Integration](#knowledge-base-and-agent-integration)
+  - [Chatbot Logic](#chatbot-logic)
+  - [Audio Processing](#audio-processing)
+  - [Streamlit User Interface](#streamlit-user-interface)
+- [Running the Application](#running-the-application)
+- [Demo: Screenshots](#demo-screenshots)
+- [License](#license)
 
 # 🚀 Architecture Overview
 
@@ -59,109 +74,7 @@ The infrastructure provisions the following:
 
   * Multiple IAM roles & permissions for a fine-grained access and communications between the used services
 
----
-
-### 📦 Prerequisites
-
-Before deploying, ensure you have:
-
-1. **Terraform ≥ 1.6.0**
-2. **AWS CLI configured** with credentials and access
-3. A **Route53 Hosted Zone** for your domain
-4. Existing **ACM certificates** for:
-
-   * wildcard `*.your-domain.com` or `chatbot.your-domain.com`
-   * `authentication.chatbot.your-domain.com`
-5. An **ECR container image** for the chatbot application (see the application section for Dockerization & push to AWS ECR)
-
----
-
-### ⚙️ Key Variables
-
-| Variable                               | Default                                          | Description                                            |
-| -------------------------------------- | ------------------------------------------------ | ------------------------------------------------------ |
-| `region`                               | `us-east-1`                                      | AWS region                                             |
-| `environment`                          | `prod`                                           | Environment name                                       |
-| `root_domain`                          | `crayon-poc.org`                                 | Root domain for Route53                                |
-| `hosted_zone_id`                       | `Z02917741R99X3VO1YC83`                          | Route53 hosted zone ID                                 |
-| `chatbot_subdomain`                    | `chatbot`                                        | Subdomain for chatbot                                  |
-| `existing_acm_cert_arn`                | (ARN)                                            | ACM cert for chatbot domain                            |
-| `existing_authentication_acm_cert_arn` | (ARN)                                            | ACM cert for Cognito auth domain                       |
-| `container_image`                      | ECR URI                                          | Chatbot container image                                |
-| `bedrock_model_id`                     | `anthropic.claude-v2`                            | Bedrock model for inference                            |
-| `bedrock_foundation_model`             | `anthropic.claude-3-haiku...`                    | Bedrock foundation model                               |
-| `voice_bucket_name`                    | `bedrock-agent-chatbot-voice-text-conversations` | S3 bucket for voice inputs                             |
-| `desired_count`                        | `1`                                              | ECS desired task count                                 |
-| `instance_type`                        | `t3.small`                                       | EC2 instance type for ECS                              |
-| `db_username`                          | `postgres`                                       | Aurora DB username                                     |
-| `db_password`                          | `Managed by Secret Manager`                      | Aurora DB password (use Secrets Manager in production) |
-
----
-
-### 🛠️ Deployment
-
-#### 1. Initialize Terraform
-
-```bash
-terraform init
-```
-
-#### 2. Review and customize variables
-
-Update `variables` in `main.tf` or create a `terraform.tfvars` file:
-
-```hcl
-region         = "us-east-1"
-environment    = "prod"
-root_domain    = "mydomain.com"
-hosted_zone_id = "Z1234567890"
-container_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/my-chatbot:latest"
-```
-
-#### 3. Apply the configuration
-
-```bash
-terraform apply
-```
-
-### 🌐 DNS & Endpoints
-
-* **Chatbot Web App:**
-  `https://chatbot.<root_domain>` → routed via ALB → ECS Streamlit app
-
-* **Authentication Domain (Cognito):**
-  `https://authentication.chatbot.<root_domain>`
-
----
-
-### 🔐 Authentication Flow
-
-1. User accesses `chatbot.<root_domain>`
-2. ALB redirects to Cognito authentication
-3. Cognito validates login → issues tokens
-4. Authenticated traffic forwarded to ECS task
-
----
-
-### 📚 Knowledge Base Setup
-
-* Upload documents (to be used for the RAG) to S3 bucket: `crayon-knowledge-base-data` # it is important to change the name of this bucket for your case
-* Aurora PostgreSQL cluster stores embeddings
-* Vector indexes (`hnsw`) and text search indexes are automatically created
-* Bedrock Knowledge Base links S3 + Aurora
-* Bedrock Agent is associated with the KB
-
----
-
-### ⚡ Bedrock Agent Action Groups
-
-* Includes a Lambda-based action group
-* Lambda executes API requests defined by an **OpenAPI schema**
-* Example: Inventory management API (`/GetProductsInventory`, `/RestockProduct`)
-
----
-
-## AWS RAG/KnowledgeBase
+# AWS RAG/Knowledge-Base/ Agent Orchestration
 
 ![RAG in Action](images/rag_diagram.png)
 
@@ -169,9 +82,8 @@ AWS Retrieval-Augmented Generation (RAG) enhances large language model (LLM) res
 
 ## Knowledge Base data
 
-script: `generate_kb_data.py`
-
-The ECommerce company has a list of 30 products. Each product has Product Id, Product Name, Type, Color, Weight, Size, Company, Price
+For this PoC/Accelerator we used files of a fictive Ecommerce company
+The Ecommerce company has a list of 30 products. Each product has Product Id, Product Name, Type, Color, Weight, Size, Company, Price
 
 ```
 
@@ -207,7 +119,7 @@ Product Id ,Product Name ,Type        ,Color  ,Weight ,Size   ,Company       ,Pr
 29 	   ,Smartphone   ,Peripheral  ,Purple ,  4.2  ,Small  ,ElectroWorld  ,  59.31
 30 	   ,Keyboard     ,Electronics ,Purple ,  4.62 ,Medium ,TechCorp      , 631.51
 ```
-
+Use script: `generate_kb_data.py` to generate fictive data that will be used by the AWS Knowledge-Base.
 The file `products_inventory.json` contains the inventory of some products. This inventory will be used for the Bedrock Agent Action Groups (`/GetProductsInventory`) inside the related lambda function.
 
 ```
@@ -239,35 +151,104 @@ The file `products_inventory.json` contains the inventory of some products. This
 
 Agents orchestrate and analyze the task and break it down into the correct logical sequence using the FM’s reasoning abilities. Agents automatically call the necessary APIs to transact with the company systems and processes to fulfill the request, determining along the way if they can proceed or if they need to gather more information.
 
-# Application
+# Terraform Deploymnt
 
-This repository contains a Python-based chatbot application that leverages AWS Bedrock services, AWS Transcribe, AWS Polly, and several other tools to provide a rich, interactive conversational experience. Users can interact with the chatbot via text or voice. The chatbot can retrieve contextual information from a knowledge base, reason using a Bedrock agent, and even convert responses to speech for an immersive experience.
+## 📦 Prerequisites
+
+Before deploying, ensure you have:
+
+1. **Terraform ≥ 1.6.0**
+2. **AWS CLI configured** with credentials and access
+3. A **Route53 Hosted Zone** for your domain
+4. Existing **ACM certificates** for:
+
+   * wildcard `*.your-domain.com` or `chatbot.your-domain.com`
+   * `authentication.chatbot.your-domain.com`
+5. An **ECR container image** for the chatbot application (see the application section for Dockerization & push to AWS ECR)
+6. Do not forget to change the name of the 2 S3 buckets that will be used to store knowledge-base data and users voice inputs
+
+---
+
+## ⚙️ Key Variables
+
+| Variable                               | Default                                          | Description                                            |
+| -------------------------------------- | ------------------------------------------------ | ------------------------------------------------------ |
+| `region`                               | `us-east-1`                                      | AWS region                                             |
+| `environment`                          | `prod`                                           | Environment name                                       |
+| `root_domain`                          | `crayon-poc.org`                                 | Root domain for Route53                                |
+| `hosted_zone_id`                       | `Z02917741R99X3VO1YC83`                          | Route53 hosted zone ID                                 |
+| `chatbot_subdomain`                    | `chatbot`                                        | Subdomain for chatbot                                  |
+| `existing_acm_cert_arn`                | (ARN)                                            | ACM cert for chatbot domain                            |
+| `existing_authentication_acm_cert_arn` | (ARN)                                            | ACM cert for Cognito auth domain                       |
+| `container_image`                      | ECR URI                                          | Chatbot container image                                |
+| `bedrock_model_id`                     | `anthropic.claude-v2`                            | Bedrock model for inference                            |
+| `bedrock_foundation_model`             | `anthropic.claude-3-haiku`                       | Bedrock foundation model                               |
+| `voice_bucket_name`                    | `bedrock-agent-chatbot-voice-text-conversations` | S3 bucket for voice inputs                             |
+| `desired_count`                        | `1`                                              | ECS desired task count                                 |
+| `instance_type`                        | `t3.small`                                       | EC2 instance type for ECS                              |
+| `db_username`                          | `postgres`                                       | Aurora DB username                                     |
+| `db_password`                          | `Managed by Secret Manager`                      | Aurora DB password (use Secrets Manager in production) |
+
+## 🛠️ Deployment
+
+### 1. Initialize Terraform
 
 ```bash
-python -m streamlit run scripts/aws_poc_interact_with_Agent_UI_enhancement_voice_chatting.py
-```  
----
+terraform init
+```
 
-## Table of Contents
+### 2. Review and customize variables
 
-- [Features](#features)
-- [Architecture Overview](#architecture-overview)
-- [Prerequisites](#prerequisites)
-- [Setup and Configuration](#setup-and-configuration)
-- [Code Structure and Explanation](#code-structure-and-explanation)
-  - [AWS Clients and Configuration](#aws-clients-and-configuration)
-  - [Rate Limiting](#rate-limiting)
-  - [Knowledge Base and Agent Integration](#knowledge-base-and-agent-integration)
-  - [Chatbot Logic](#chatbot-logic)
-  - [Audio Processing](#audio-processing)
-  - [Streamlit User Interface](#streamlit-user-interface)
-- [Running the Application](#running-the-application)
-- [Demo: Screenshots](#demo-screenshots)
-- [License](#license)
+Update `variables` in `main.tf` or create a `terraform.tfvars` file:
 
----
+```hcl
+region         = "us-east-1"
+environment    = "prod"
+root_domain    = "mydomain.com"
+hosted_zone_id = "Z1234567890"
+container_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/my-chatbot:latest"
+```
+### 3. Apply the configuration
 
-## Features
+```bash
+terraform apply
+```
+## 🌐 DNS & Endpoints
+
+* **Chatbot Web App:**
+  `https://chatbot.<root_domain>` → routed via ALB → ECS Streamlit app
+
+* **Authentication Domain (Cognito):**
+  `https://authentication.chatbot.<root_domain>`
+
+## 🔐 Authentication Flow
+
+1. User accesses `chatbot.<root_domain>`
+2. ALB redirects to Cognito authentication
+3. Cognito validates login → issues tokens
+4. Authenticated traffic forwarded to ECS task
+
+## 📚 Knowledge Base Setup
+
+* Upload documents (to be used for the RAG) to S3 bucket: `crayon-knowledge-base-data` # it is important to change the name of this bucket for your case
+* Aurora PostgreSQL cluster stores embeddings
+* Vector indexes (`hnsw`) and text search indexes are automatically created
+* Bedrock Knowledge Base links S3 + Aurora
+* Bedrock Agent is associated with the KB
+
+## ⚡ Bedrock Agent Action Groups
+
+* Includes a Lambda-based action group `lambda_function.py`
+* Lambda executes API requests defined by an **OpenAPI schema**
+* Example: Inventory management API (`/GetProductsInventory`, `/RestockProduct`)
+
+# Application & Dockerization
+
+This repository contains a Python-based chatbot application that leverages AWS Bedrock services, AWS Transcribe, AWS Polly, and several other tools to provide a rich, interactive conversational experience. Users can interact with the chatbot via text or voice. The chatbot can retrieve contextual information from the knowledge-base, reason using a Bedrock agent, and even convert responses to speech for an immersive experience.
+
+## The application components
+
+### Features
 
 - **Multi-modal Interaction:** Users can communicate via text or voice.
 - **Voice Transcription:** Convert recorded audio to text using AWS Transcribe.
@@ -277,15 +258,13 @@ python -m streamlit run scripts/aws_poc_interact_with_Agent_UI_enhancement_voice
 - **Rate Limiting:** Protects API calls from exceeding defined thresholds.
 - **Streamlit Interface:** A user-friendly web UI for interactive conversations.
 
----
-
-## Architecture Overview
+### Application Overview
 
 The application is built on top of several AWS services and Python libraries:
 
 - **AWS Bedrock Services:**  
-  - **Bedrock LLM:** For generating responses with a language model.
-  - **Bedrock Agent & Knowledge Base:** For reasoning and retrieval of contextual information.
+- **Bedrock LLM:** For generating responses with a language model.
+- **Bedrock Agent & Knowledge Base:** For reasoning and retrieval of contextual information.
 - **AWS Transcribe:** To convert user voice input into text.
 - **AWS Polly:** To generate audio (speech) from text responses.
 - **S3:** For storing audio files required by AWS Transcribe.
@@ -293,306 +272,108 @@ The application is built on top of several AWS services and Python libraries:
 - **Langchain:** To orchestrate prompt templates and chains for LLM interaction.
 - **Rate Limit Decorators:** To prevent API throttling.
 
----
+## Dockerization & tests
 
-## Prerequisites
+* Once the AWS Knowledge-Base & the Agent are set-up, the chatbot application can be tested locally in Docker.
+* Below are the required files (docker-compose, Dockerfile, .env file)
+* Make sure to update the .env file with your AWS Secrets having access to the required services like bedrock, polly, transcribe, s3, etc)
+* command: ```docker-compose up --build```
+* Connect after that to http://localhost:8501
 
-Before running the application, ensure you have:
+docker-compose.yml:
+```yaml
+version: "3.9"
 
-- An AWS account with proper permissions for Bedrock, Transcribe, Polly, and S3.
-- AWS credentials configured (e.g., using an AWS CLI profile).
-- The necessary Python packages installed:
-  - `boto3`
-  - `streamlit`
-  - `langchain`
-  - `ratelimit`
-  - `audio_recorder_streamlit`
-  - `sounddevice`
-  - `soundfile`
-- A pre-configured S3 bucket for storing audio files.
-- Bedrock model, knowledge base, and agent identifiers as provided by AWS.
-
----
-
-## Setup and Configuration
-
-1. **AWS Credentials:**  
-   Ensure your AWS credentials are set up correctly. The script initializes a session using:
-   ```python
-   session = boto3.Session(profile_name="maziadi")
-   ```
-   Replace `"maziadi"` with your AWS profile name if different.
-
-2. **S3 Bucket:**  
-   Update the S3 bucket name if necessary:
-   ```python
-   S3_BUCKET_NAME = "maziadi-bedrock-agent-chatbot-voice-text-conversations"
-   ```
-
-3. **Bedrock Model & Agent IDs:**  
-   Set the appropriate IDs for your Bedrock model, knowledge base, and agent:
-   ```python
-   MODEL_ID = "anthropic.claude-v2"
-   KNOWLEDGE_BASE_ID = "RR9ZKRQOR1"
-   AGENT_ID = "VURA79GVOW"
-   AGENT_ALIAS = "KPEQSPGXPP"
-   ```
-
-4. **Rate Limiting Configuration:**  
-   The application limits API calls to avoid throttling:
-   ```python
-   CALLS_PER_MINUTE = 100
-   PERIOD = 60
-   ```
-
----
-
-## Code Structure and Explanation
-
-The script is divided into several logical sections. Below is a breakdown of the key components:
-
-### AWS Clients and Configuration
-
-- **Session and Clients Initialization:**
-  ```python
-  session = boto3.Session(profile_name="maziadi")
-  bedrock_client = session.client("bedrock-runtime", region_name="us-east-1")
-  kbs_client = session.client("bedrock-agent-runtime", region_name="us-east-1")
-  agent_client = session.client("bedrock-agent-runtime", region_name="us-east-1")
-  transcribe_client = session.client("transcribe", region_name="us-east-1")
-  polly_client = session.client("polly", region_name="us-east-1")
-  s3_client = session.client("s3", region_name="us-east-1")
-  ```
-  These lines set up the required AWS clients for Bedrock, transcription, TTS, and S3 operations.
-
-- **Bedrock LLM Initialization:**
-  ```python
-  llm = Bedrock(
-      model_id=MODEL_ID,
-      client=bedrock_client,
-      model_kwargs={"max_tokens_to_sample": 100, "temperature": 0.9}
-  )
-  ```
-  The LLM is configured with model parameters such as token limit and temperature.
-
-### Rate Limiting
-
-- **Decorator for API Calls:**
-  ```python
-  @sleep_and_retry
-  @limits(calls=CALLS_PER_MINUTE, period=PERIOD)
-  def rate_limited_invoke_agent(agent_client, **kwargs):
-      return agent_client.invoke_agent(**kwargs)
-  ```
-  This ensures that the number of requests made to the Bedrock agent does not exceed the specified limit.
-
-### Knowledge Base and Agent Integration
-
-- **Querying the Knowledge Base:**
-  ```python
-  def query_knowledge_base(question):
-      try:
-          response = kbs_client.retrieve(
-              knowledgeBaseId=KNOWLEDGE_BASE_ID,
-              retrievalQuery={"text": question}
-          )
-          if response.get("retrievalResults"):
-              return response["retrievalResults"][0]["content"]
-          else:
-              return "No relevant information found in the knowledge base."
-      except Exception as e:
-          return f"Error retrieving knowledge: {str(e)}"
-  ```
-  This function queries the configured knowledge base and returns the most relevant piece of content.
-
-- **Invoking the Bedrock Agent:**
-  ```python
-  def invoke_bedrock_agent(question):
-      try:
-          response = rate_limited_invoke_agent(
-              agent_client,
-              agentAliasId=AGENT_ALIAS,
-              agentId=AGENT_ID,
-              sessionId="user-session-1",
-              inputText=question,
-              enableTrace=True,
-              endSession=False
-          )
-          
-          output = ""
-          for event in response.get("completion", []):
-              if "chunk" in event:
-                  output += event["chunk"].get("bytes", b"").decode()
-          return output
-      except Exception as e:
-          return f"Error invoking agent: {str(e)}"
-  ```
-  This function invokes the Bedrock agent (with rate limiting) and assembles the response from data chunks.
-
-### Chatbot Logic
-
-- **Main Chatbot Function:**
-  ```python
-  def my_chatbot(language, freeform_text, use_agent, conversation_history):
-      if use_agent:
-          return invoke_bedrock_agent(freeform_text)
-      
-      knowledge_base_response = query_knowledge_base(freeform_text)
-      
-      context = "\n".join([f"Human: {h}\nAI: {a}" for h, a in conversation_history])
-      
-      prompt = PromptTemplate(
-          input_variables=["language", "context", "freeform_text", "knowledge_base"],
-          template="""You are a chatbot. You are in {language}.
-  
-  Previous conversation:
-  {context}
-  
-  The user asked: {freeform_text}
-  
-  Here is relevant information:
-  
-  {knowledge_base}
-  
-  Provide a concise and relevant response:"""
-      )
-      
-      bedrock_chain = LLMChain(llm=llm, prompt=prompt)
-      return bedrock_chain.run({
-          'language': language, 
-          'context': context,
-          'freeform_text': freeform_text, 
-          'knowledge_base': knowledge_base_response
-      })
-  ```
-  This function determines whether to use the Bedrock agent directly or to generate a response based on both a knowledge base lookup and a conversational context. It leverages a prompt template to structure the conversation.
-
-### Audio Processing
-
-- **Transcribing Audio:**
-  ```python
-  def transcribe_audio(audio_file_path):
-      job_name = f"transcribe_job_{int(time.time())}"
-      s3_audio_uri = f"s3://{S3_BUCKET_NAME}/{os.path.basename(audio_file_path)}"
-      
-      # Upload audio file to S3
-      s3_client.upload_file(audio_file_path, S3_BUCKET_NAME, os.path.basename(audio_file_path))
-      
-      # Start transcription job
-      transcribe_client.start_transcription_job(
-          TranscriptionJobName=job_name,
-          Media={'MediaFileUri': s3_audio_uri},
-          MediaFormat='mp3',
-          LanguageCode='en-US'
-      )
-      
-      # Wait for the transcription job to complete
-      while True:
-          status = transcribe_client.get_transcription_job(TranscriptionJobName=job_name)
-          if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:
-              break
-          time.sleep(5)
-      
-      if status['TranscriptionJob']['TranscriptionJobStatus'] == 'COMPLETED':
-          result = transcribe_client.get_transcription_job(TranscriptionJobName=job_name)
-          transcript_uri = result['TranscriptionJob']['Transcript']['TranscriptFileUri']
-          
-          # Download the transcript directly from the provided URI
-          with urllib.request.urlopen(transcript_uri) as response:
-              transcript_json = json.loads(response.read())
-              transcript = transcript_json['results']['transcripts'][0]['transcript']
-          
-          return transcript
-      else:
-          return "Transcription failed"
-  ```
-  This function uploads the audio file to S3, starts an AWS Transcribe job, waits for its completion, and then retrieves the transcription.
-
-- **Text-to-Speech Conversion:**
-  ```python
-  def text_to_speech(text, language):
-      response = polly_client.synthesize_speech(
-          Text=text,
-          OutputFormat='mp3',
-          VoiceId='Joanna' if language == 'english' else 'Celine'
-      )
-      
-      if "AudioStream" in response:
-          with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
-              temp_audio.write(response['AudioStream'].read())
-              temp_audio_path = temp_audio.name
-          
-          return temp_audio_path
-      else:
-          return None
-  ```
-  This function uses AWS Polly to synthesize speech from text. It chooses the voice based on the selected language and writes the audio output to a temporary file.
-
-### Streamlit User Interface
-
-- **Building the UI:**
-  The application uses Streamlit to create an interactive web interface:
-  - **Title and Sidebar Options:**  
-    The UI allows users to select their language and whether to use the Bedrock agent for reasoning.
-  - **Chat Display:**  
-    The conversation history is displayed with messages from the human and AI. Each AI response includes an audio playback option.
-  - **Voice Input:**  
-    The UI provides an audio recorder (via `audio_recorder_streamlit`) that allows users to speak their input. The recorded audio is transcribed using AWS Transcribe.
-  - **Text Input Fallback:**  
-    If no audio is recorded, a text input box is provided.
-  - **Conversation Management:**  
-    Users can clear the conversation history from the sidebar.
-
-The Streamlit code ties together all the functionalities:
-```python
-st.title("Bedrock AI Chatbot with Knowledge Base, Agent, and Voice Interaction")
-# ... [UI code that manages conversation history, displays messages, handles audio recording and playback, etc.] ...
+services:
+  bedrock-rag-chatbot:
+    build: .
+    container_name: bedrock-rag-chatbot
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    volumes:
+      - .:/application
 ```
 
+Dockerfile
+```yaml
+# Use a lightweight Python image
+FROM python:3.11-slim
+
+# Prevent Python from writing .pyc files
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Create a working directory
+WORKDIR /app
+
+# Install minimal system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the code
+COPY . .
+
+# Expose the Streamlit port
+EXPOSE 8501
+
+# Startup command
+CMD ["streamlit", "run", "application.py", "--server.port=8501", "--server.address=0.0.0.0"]
+```
+.env :
+```bash
+AWS_REGION=us-east-1
+S3_BUCKET_NAME=bedrock-agent-chatbot-voice-text-conversations
+MODEL_ID=anthropic.claude-v2
+KNOWLEDGE_BASE_ID=YOUR_KNOWLEDGE_BASE_ID
+AGENT_ID=YOUR_AGENT_ID
+AGENT_ALIAS=YOUR_AGENT_ALIAS
+AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
+AWS_SESSION_TOKEN=YOUR_AWS_SESSION_TOKEN
+```
+## Pushing Docker image to AWS ECR
+
+```
+1. Create your ECR Repository
+2. aws ecr get-login-password --region YOUR_REGION | docker login --username AWS --password-stdin \
+YOUR_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
+3. docker build -t bedrock-rag-chatbot .
+4. docker tag bedrock-rag-chatbot:latest YOUR_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/bedrock-rag-chatbot:latest
+5. docker push YOUR_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/bedrock-rag-chatbot:latest
+```
 ---
 
-## Running the Application
+# Demo: Screenshots
 
-1. **Install Dependencies:**
-   Ensure all required packages are installed. For example:
-   ```bash
-   pip install boto3 streamlit langchain ratelimit audio_recorder_streamlit sounddevice soundfile
-   ```
-
-2. **Configure AWS Credentials:**  
-   Verify that your AWS credentials (and the required permissions) are correctly set up.
-
-3. **Run the Streamlit App:**
-   ```bash
-   python -m streamlit run aws-bedrock-agent-rag-chatbot/scripts/aws_poc_interact_with_Agent_UI_enhancement_voice_chatting.py
-   ```
-   
-4. **Interact with the Chatbot:**  
-   Open the provided URL (http://localhost:8501) in your browser, and start interacting with the chatbot either via text or by recording your voice.
-
----
-
-## Demo: Screenshots
-
-### Agent RAG - Knowledge-Base
+## Agent RAG - Knowledge-Base
 
 ![Agent Thinking](images/agent_thinking.png)
 
 ![Agent RAG](images/Agent_RAG_answer.png)
 
-### Voice chatting - Agent Action Groups: Action 1: /GetProductsInventory
+## Voice chatting - Agent Action Groups: Action 1: /GetProductsInventory
 
 ![Recording](images/recording.png)
 
 ![Agent action_groups and Voice chatting](images/chatbot_agent_RAG_Voice_chatting.png)
 
-### Agent Action Groups: Action 2: /RestockProduct
+## Agent Action Groups: Action 2: /RestockProduct
 
 ![Agent action_groups_restock_product](images/agent_restock_product.png)
 
 ---
 
-## License
+# License
 
 This project is licensed under the [MIT License](LICENSE.md).
 
