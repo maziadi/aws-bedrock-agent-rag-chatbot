@@ -50,7 +50,7 @@ resource "aws_lb_listener" "https" {
     }
   }
 
-  # 2 Redirection vers le Target Group si authentifié
+  # 2 Redirection to Target Group after authentication
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.this.arn
@@ -61,4 +61,5 @@ resource "aws_lb_listener" "https" {
     aws_cognito_user_pool_domain.chatbot_authentication_domain,
     aws_route53_record.cognito_authentication_domain
   ]
+
 }
