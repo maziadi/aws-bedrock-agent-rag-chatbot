@@ -36,7 +36,7 @@ variable "container_image" {
 }
 
 # Bedrock
-variable "bedrock_model_id" { default = "anthropic.claude-v2" }
+variable "bedrock_model_id" { default = "anthropic.claude-3-haiku-20240307-v1:0" }
 
 variable "bedrock_foundation_model" { default = "anthropic.claude-3-haiku-20240307-v1:0" }
 

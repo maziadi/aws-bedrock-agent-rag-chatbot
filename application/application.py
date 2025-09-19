@@ -4,7 +4,7 @@ import tempfile
 import json
 import urllib.request
 from ratelimit import limits, sleep_and_retry
-from langchain_community.llms import Bedrock
+from langchain_community.chat_models.bedrock import BedrockChat
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 import boto3
@@ -15,7 +15,7 @@ from io import BytesIO
 # Configuration (via .env or ECS Task env vars)
 # ---------------------------------------------
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "bedrock-agent-chatbot-voice-text-conversations")
-MODEL_ID = os.getenv("MODEL_ID", "anthropic.claude-v2")
+MODEL_ID = os.getenv("MODEL_ID", "anthropic.claude-3-haiku-20240307-v1:0")
 KNOWLEDGE_BASE_ID = os.getenv("KNOWLEDGE_BASE_ID", "")
 AGENT_ID = os.getenv("AGENT_ID", "")
 AGENT_ALIAS = os.getenv("AGENT_ALIAS", "")
@@ -37,10 +37,13 @@ CALLS_PER_MINUTE = 100
 PERIOD = 60
 
 # Initialize LLM
-llm = Bedrock(
-    model_id=MODEL_ID,
+llm = BedrockChat(
     client=bedrock_client,
-    model_kwargs={"max_tokens_to_sample": 100, "temperature": 0.9}
+    model_id=MODEL_ID,
+    model_kwargs={
+        "max_tokens": 100,
+        "temperature": 0.9
+    }
 )
 
 @sleep_and_retry
@@ -186,6 +189,7 @@ if "is_listening" not in st.session_state:
 st.title("Bedrock AI Chatbot (Agent + RAG)")
 
 # Sidebar
+st.sidebar.image("crayon-logo.png", width=300)
 language = st.sidebar.selectbox("Select Language", ["english", "french"])
 use_agent = st.sidebar.checkbox("Use Bedrock Agent for Reasoning")
 
