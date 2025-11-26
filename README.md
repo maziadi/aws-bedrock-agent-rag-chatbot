@@ -392,7 +392,7 @@ A recruting company has hundreds of CVs and wants to find quickly a good candida
 
 ### Video Demo
 
-![Finding_good_candidate_for_devops_mission](images/Demo-chatbot-aws.mp4)
+![Finding_good_candidate_for_devops_mission](images/Demo-chatbot-aws_Devops_candiate_selection.mp4)
 
 ---
 
