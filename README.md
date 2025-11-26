@@ -26,7 +26,7 @@ The infrastructure is managed by **Terraform (IaC)** and the repository contains
     - [Application Overview](#application-overview)
   - [Dockerization & tests](#dockerization--tests)
   - [Pushing Docker image to AWS ECR](#pushing-docker-image-to-aws-ecr)
-- [Demo: Screenshots](#demo-screenshots)
+- [Demos: Screenshots](#demos-screenshots)
   - [Agent RAG - Knowledge-Base](#agent-rag---knowledge-base)
   - [Voice chatting - Agent Action Groups: Action 1: /GetProductsInventory](#voice-chatting---agent-action-groups-action-1-getproductsinventory)
   - [Agent Action Groups: Action 2: /RestockProduct](#agent-action-groups-action-2-restockproduct)
