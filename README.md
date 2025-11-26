@@ -364,23 +364,35 @@ YOUR_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
 ```
 ---
 
-# Demo: Screenshots
+# Demos: Screenshots
 
-## Agent RAG - Knowledge-Base
+## Demo 1 : RAG Agent for ECommerce company
+
+### Agent RAG - Knowledge-Base
 
 ![Agent Thinking](images/agent_thinking.png)
 
 ![Agent RAG](images/Agent_RAG_answer.png)
 
-## Voice chatting - Agent Action Groups: Action 1: /GetProductsInventory
+### Voice chatting - Agent Action Groups: Action 1: /GetProductsInventory
 
 ![Recording](images/recording.png)
 
 ![Agent action_groups and Voice chatting](images/chatbot_agent_RAG_Voice_chatting.png)
 
-## Agent Action Groups: Action 2: /RestockProduct
+### Agent Action Groups: Action 2: /RestockProduct
 
 ![Agent action_groups_restock_product](images/agent_restock_product.png)
+
+## Demo 2: RAG Agent for a recruting company
+
+### Context
+
+A recruting company has hundreds of CVs and wants to find quickly a good candidate for a DevOps mission.
+
+### Video Demo
+
+![Finding_good_candidate_for_devops_mission](images/Demo-chatbot-aws.mp4)
 
 ---
 
