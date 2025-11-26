@@ -12,7 +12,7 @@ The infrastructure is managed by **Terraform (IaC)** and the repository contains
 - [AWS RAG/Knowledge-Base/ Agent Orchestration](#aws-ragknowledge-base-agent-orchestration)
   - [Knowledge Base data](#knowledge-base-data)
   - [Bedrock Agent orchestration](#bedrock-agent-orchestration)
-- [Terraform Deploymnt](#terraform-deploymnt)
+- [Terraform Deploymnt](#terraform-deployment)
   - [Prerequisites](#-prerequisites)
   - [Key Variables](#️-key-variables)
   - [Deployment](#️-deployment)
@@ -392,7 +392,10 @@ A recruting company has hundreds of CVs and wants to find quickly a good candida
 
 ### Video Demo
 
-![Finding_good_candidate_for_devops_mission](images/Demo-chatbot-aws_Devops_candiate_selection.mp4)
+
+https://github.com/user-attachments/assets/7ff7df8f-9453-487f-ba89-1f002213f925
+
+
 
 ---
 
